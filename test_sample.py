@@ -16,6 +16,18 @@ def test_yandex_title():
     assert title.startswith(u'Яндекс')
 
 
+def test_refresh_yandex_ua():
+    phantom = PhantomJS(service_args=['--ssl-protocol=any'])
+    phantom.get('https://yandex.ru')
+    sleep(15)
+    phantom.refresh()
+    sleep(10)
+    current_url = phantom.current_url
+    phantom.save_screenshot('phantom-{}.png'.format(random.random()))
+    phantom.quit()
+    assert current_url.startswith('https://www.yandex.ua/')
+
+
 def get_property(property_name):
     phantom = PhantomJS(service_args=['--ssl-protocol=any'])
     phantom.get('https://yandex.ru')
