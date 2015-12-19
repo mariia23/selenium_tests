@@ -1,38 +1,33 @@
 # -*- coding: utf-8 -*-
 
-
-from selenium.webdriver import PhantomJS
+import random
 from time import sleep
-import random 
+
+import pytest
+from selenium.webdriver import PhantomJS
 
 
-def test_redirect_yandex_ua():
-    current_url = get_property('current_url')
-    assert current_url.startswith('https://www.yandex.ua/')
+def test_redirect_yandex_ua(phantom):
+    assert phantom.current_url.startswith('https://www.yandex.ua/')
 
 
-def test_yandex_title():
-    title = get_property('title')
-    assert title.startswith(u'Яндекс')
+def test_yandex_title(phantom):
+    assert phantom.title.startswith(u'Яндекс')
 
 
-def test_refresh_yandex_ua():
-    phantom = PhantomJS(service_args=['--ssl-protocol=any'])
-    phantom.get('https://yandex.ru')
-    sleep(15)
+def test_refresh_yandex_ua(phantom):
     phantom.refresh()
     sleep(10)
-    current_url = phantom.current_url
-    phantom.save_screenshot('phantom-{}.png'.format(random.random()))
-    phantom.quit()
-    assert current_url.startswith('https://www.yandex.ua/')
+    assert phantom.current_url.startswith('https://www.yandex.ua/')
 
 
-def get_property(property_name):
+@pytest.yield_fixture
+def phantom():
     phantom = PhantomJS(service_args=['--ssl-protocol=any'])
     phantom.get('https://yandex.ru')
     sleep(15)
-    properti = getattr(phantom, property_name)
+
+    yield phantom
+
     phantom.save_screenshot('phantom-{}.png'.format(random.random()))
     phantom.quit()
-    return properti
