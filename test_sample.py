@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import random
-from time import sleep
 
 import pytest
 from selenium.webdriver import PhantomJS
@@ -17,17 +16,16 @@ def test_yandex_title(phantom):
 
 def test_refresh_yandex_ua(phantom):
     phantom.refresh()
-    sleep(10)
     assert phantom.current_url.startswith('https://www.yandex.ua/')
 
 
 @pytest.yield_fixture
-def phantom():
+def phantom(request):
     phantom = PhantomJS(service_args=['--ssl-protocol=any'])
+    phantom.set_page_load_timeout(30)
     phantom.get('https://yandex.ru')
-    sleep(15)
 
     yield phantom
 
-    phantom.save_screenshot('phantom-{}.png'.format(random.random()))
+    phantom.save_screenshot('phantom_{}.png'.format(request.node.name))
     phantom.quit()
